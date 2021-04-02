@@ -56,7 +56,16 @@ jobs:
 
           TARGETS=linux-x64
           npx oclif-dev pack --targets=$TARGETS
-
+      - name: Create Release and push artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ steps.TAG_UTIL.outputs.gh_release_name }}
+          tag_name: ${{ steps.TAG_UTIL.outputs.gh_tag }}
+          files: "./dist/channels/**/chectl-*.gz"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Update github pages
+        run: |
           git clone https://github.com/tolusha/chectl -b gh-pages --single-branch gh-pages
           rm -rf gh-pages/.git
           echo $(date +%s) > gh-pages/update
@@ -68,11 +77,3 @@ jobs:
           BRANCH: gh-pages
           FOLDER: gh-pages
           CLEAN: true # Automatically remove deleted files from the deploy branch
-      - name: Create Release and push artifacts
-        uses: softprops/action-gh-release@v1
-        with:
-          name: ${{ steps.TAG_UTIL.outputs.gh_release_name }}
-          tag_name: ${{ steps.TAG_UTIL.outputs.gh_tag }}
-          files: "./dist/channels/**/chectl-*.gz"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
